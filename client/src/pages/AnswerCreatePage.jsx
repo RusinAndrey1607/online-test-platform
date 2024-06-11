@@ -3,6 +3,7 @@ import { Typography, Container, Box, TextField, Button, FormControl, InputLabel,
 import { useDispatch, useSelector } from 'react-redux';
 import { createAnswer, resetAnswerState } from '../store/answerSlice';
 import { fetchQuestions } from '../store/questionSlice';
+import NavBar from '../components/NavBar';
 
 const AnswerCreatePage = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const AnswerCreatePage = () => {
     setIsCorrect(false);
     setValue('');
     setSelectedQuestion('');
+    alert("Answer has been created")
   };
 
   useEffect(() => {
@@ -37,6 +39,8 @@ const AnswerCreatePage = () => {
   }, [dispatch]);
 
   return (
+    <>
+    <NavBar />
     <Container maxWidth="md">
       <Typography variant="h4" gutterBottom>Create Answer</Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
@@ -98,6 +102,8 @@ const AnswerCreatePage = () => {
         {answerError && <Typography variant="body2" color="error" sx={{ mt: 2 }}>{answerError}</Typography>}
       </Box>
     </Container>
+    </>
+    
   );
 };
 

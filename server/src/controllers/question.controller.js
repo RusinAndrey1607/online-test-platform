@@ -1,8 +1,24 @@
 const { validationResult } = require("express-validator");
 const ApiError = require("../exceptions/api.error");
 const questionService = require("../services/question.service");
+const { Answer, Question } = require("../models/models");
 
 class QuestionController {
+  async getQuestionsWithAnswers(req, res, next) {
+    try {
+      const questions = await Question.findAll({
+        include: [
+          {
+            model: Answer,
+            attributes: ["id", "text", "isCorrect", "value"],
+          },
+        ],
+      });
+      res.json(questions);
+    } catch (error) {
+      next(error);
+    }
+  }
   async getQuestionsBySubject(req, res, next) {
     try {
       const { subjectId } = req.params;
@@ -49,7 +65,6 @@ class QuestionController {
       next(error);
     }
   }
-
 }
 
 module.exports = new QuestionController();

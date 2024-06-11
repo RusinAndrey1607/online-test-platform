@@ -1,9 +1,10 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
-import {apiAxios} from "../app/api";
+import { apiAxios } from "../app/api";
 import { useDispatch } from "react-redux";
 import { login } from "../store/auth.slice";
+import NavBar from "../components/NavBar";
 
 const AuthPage = () => {
   const location = useLocation();
@@ -14,8 +15,8 @@ const AuthPage = () => {
   const handleAuth = async (data) => {
     const endpoint = isLogin ? "/auth/login" : "/auth/registration";
     try {
-      console.log(data)
-    const {data:userData} = await apiAxios.post(endpoint,data,)
+      console.log(data);
+      const { data: userData } = await apiAxios.post(endpoint, data);
       console.log(userData);
       document.cookie = `userData=${JSON.stringify(
         userData
@@ -28,7 +29,10 @@ const AuthPage = () => {
   };
 
   return (
-    <AuthForm onSubmit={handleAuth} type={isLogin ? "login" : "register"} />
+    <>
+      <NavBar />
+      <AuthForm onSubmit={handleAuth} type={isLogin ? "login" : "register"} />
+    </>
   );
 };
 

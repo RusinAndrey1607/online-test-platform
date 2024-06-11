@@ -1,7 +1,6 @@
 const express = require("express");
 const { check } = require("express-validator");
 const questionController = require("../controllers/question.controller");
-
 const questionRouter = express.Router();
 
 questionRouter.post(
@@ -15,14 +14,21 @@ questionRouter.post(
       .withMessage("Difficulty must be between 1 and 5"),
     check("subjectId")
       .isInt()
-      .withMessage("Subject ID must be a valid integer")
+      .withMessage("Subject ID must be a valid integer"),
   ],
   questionController.createQuestion
+);
+questionRouter.get(
+  "/questions-with-answers",
+  questionController.getQuestionsWithAnswers
 );
 
 questionRouter.get("/all", questionController.getAllQuestions);
 
 questionRouter.get("/:id", questionController.getQuestionById);
-questionRouter.get("/subject/:subjectId", questionController.getQuestionsBySubject);
+questionRouter.get(
+  "/subject/:subjectId",
+  questionController.getQuestionsBySubject
+);
 
 module.exports = questionRouter;

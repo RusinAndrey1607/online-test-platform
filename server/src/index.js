@@ -30,7 +30,7 @@ app.use("/auth", authRouter)
 app.use("/subjects", authMiddleware,roleMiddleware("TEACHER"), subjectRouter);
 app.use("/questions", authMiddleware, roleMiddleware("TEACHER"), questionRouter);
 app.use("/answers", authMiddleware, answerRouter);
-app.use("/results", authMiddleware, resultRouter);
+app.use("/result", authMiddleware, resultRouter);
 app.use("/sessions", authMiddleware, testSessionRouter);
 app.use(errorMiddleware)
 

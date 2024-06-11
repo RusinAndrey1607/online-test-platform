@@ -6,6 +6,7 @@ import WithTeacherRole from "../hoc/WithTeacherRole";
 import SubjectCreatePage from "../pages/CreateSubject";
 import QuestionCreatePage from "../pages/QuestionCreate";
 import AnswerCreatePage from "../pages/AnswerCreatePage";
+import QuestionsPage from "../pages/QuestionsPage";
 
 export const router = createBrowserRouter([
   {
@@ -33,4 +34,8 @@ export const router = createBrowserRouter([
     path: "/answers/create",
     element: <WithTeacherRole element={<AnswerCreatePage />} />,
   },
+  {
+    path: "/questions",
+    element: <WithAuth element={<QuestionsPage />} />
+  }
 ]);

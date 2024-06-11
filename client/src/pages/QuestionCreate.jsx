@@ -13,6 +13,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { createQuestion } from "../store/questionSlice";
 import { fetchSubjects } from "../store/subjectSlice";
+import NavBar from "../components/NavBar";
 
 const QuestionCreatePage = () => {
   const dispatch = useDispatch();
@@ -46,7 +47,9 @@ const QuestionCreatePage = () => {
     }
   }, [dispatch, subjects]);
   return (
-    <Container maxWidth="md">
+    <>
+    <NavBar />
+     <Container maxWidth="md">
       <Typography variant="h4" gutterBottom>
         Create Question
       </Typography>
@@ -106,6 +109,8 @@ const QuestionCreatePage = () => {
         )}
       </Box>
     </Container>
+    </>
+   
   );
 };
 

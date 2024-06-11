@@ -1,70 +1,79 @@
 const { Result, User, Question, Answer } = require("../models/models");
-const ApiError = require("../exceptions/api.error");
 
 class ResultService {
+  async getUserTotalScore(userId) {
+    const userResults = await Result.findAll({ where: { userId } });
+    const totalScore = userResults.reduce(
+      (total, result) => total + result.score,
+      0
+    );
+
+    const possibleTotalScore = await this.getPossibleTotalScore(userId);
+
+    return { totalScore, possibleTotalScore };
+  }
+
+  async getPossibleTotalScore(userId) {
+    const userResults = await Result.findAll({
+      where: { userId },
+      include: [{ model: Question }],
+    });
+
+    const questionIds = userResults.map((result) => result.questionId);
+    const questions = await Question.findAll({
+      where: { id: questionIds },
+      include: [{ model: Answer }],
+    });
+
+    const possibleTotalScore = questions.reduce((total, question) => {
+      const maxAnswerValue = Math.max(
+        ...question.Answers.map((answer) => answer.value)
+      );
+      return total + maxAnswerValue;
+    }, 0);
+
+    return possibleTotalScore;
+  }
   async submitAnswers(userId, answers) {
+    const existingResults = await Result.findAll({
+      where: { userId },
+      raw: true,
+    });
+
+    const existingResultsMap = existingResults.reduce((acc, result) => {
+      acc[result.questionId] = result;
+      return acc;
+    }, {});
+
     const results = [];
     for (const answer of answers) {
       const { questionId, answerId } = answer;
-      const correctAnswer = await Answer.findOne({ where: { id: answerId, isCorrect: true } });
+      const correctAnswer = await Answer.findOne({
+        where: { id: answerId, isCorrect: true },
+      });
       const score = correctAnswer ? correctAnswer.value : 0;
 
-      console.log(userId)
-      const result = await Result.create({
-        userId,
-        QuestionId:questionId,
-        score
-      });
-
-      results.push(result);
+      if (existingResultsMap[questionId]) {
+        const updatedResult = await Result.update(
+          { answerId, score },
+          { where: { userId, questionId }, returning: true }
+        );
+        results.push(updatedResult[1][0]);
+      } else {
+        const result = await Result.create({
+          userId,
+          questionId,
+          answerId,
+          score,
+        });
+        results.push(result);
+      }
     }
     return results;
   }
-  async createResult(score, userId, questionId) {
-    const user = await User.findByPk(userId);
-    if (!user) {
-      throw ApiError.NotFound(`User with id ${userId} not found`);
-    }
-    const question = await Question.findByPk(questionId);
-    if (!question) {
-      throw ApiError.NotFound(`Question with id ${questionId} not found`);
-    }
-    const result = await Result.create({ score, userId, questionId });
-    return result;
-  }
-
   async getAllResults() {
     const results = await Result.findAll({ include: [User, Question] });
     return results;
-  }
-
-  async getResultById(id) {
-    const result = await Result.findByPk(id, { include: [User, Question] });
-    if (!result) {
-      throw ApiError.NotFound(`Result with id ${id} not found`);
-    }
-    return result;
-  }
-
-  async updateResult(id, score, userId, questionId) {
-    const result = await Result.findByPk(id);
-    if (!result) {
-      throw ApiError.NotFound(`Result with id ${id} not found`);
-    }
-    result.score = score;
-    result.userId = userId;
-    result.questionId = questionId;
-    await result.save();
-    return result;
-  }
-
-  async deleteResult(id) {
-    const result = await Result.findByPk(id);
-    if (!result) {
-      throw ApiError.NotFound(`Result with id ${id} not found`);
-    }
-    await result.destroy();
-    return { message: `Result with id ${id} deleted successfully` };
   }
 }
 

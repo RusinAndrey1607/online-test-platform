@@ -1,10 +1,10 @@
+import React from 'react';
+import NavBar from './components/NavBar';
 
-function App() {
+const App = () => {
   return (
-    <>
-    React
-    </>
-  )
-}
+    <NavBar />
+  );
+};
 
-export default App
+export default App;

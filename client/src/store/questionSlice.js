@@ -5,6 +5,7 @@ const initialState = {
   loading: false,
   error: null,
   questions: [],
+  questionsWithAnswers: [],
 };
 
 export const createQuestion = createAsyncThunk(
@@ -30,6 +31,19 @@ export const fetchQuestions = createAsyncThunk(
     }
   }
 );
+
+export const fetchQuestionsWithAnswers = createAsyncThunk(
+  "question/fetchQuestionsWithAnswers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await apiAxios.get("/questions/questions-with-answers");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
 const questionCreateSlice = createSlice({
   name: "questionCreate",
   initialState,
@@ -40,6 +54,9 @@ const questionCreateSlice = createSlice({
     },
     setQuestions(state, action) {
       state.questions = action.payload;
+    },
+    setQuestionsWithAnswers(state, action) {
+      state.questionsWithAnswers = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -67,10 +84,22 @@ const questionCreateSlice = createSlice({
       .addCase(fetchQuestions.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchQuestionsWithAnswers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchQuestionsWithAnswers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.questionsWithAnswers = action.payload;
+      })
+      .addCase(fetchQuestionsWithAnswers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { resetQuestionState, setQuestions } = questionCreateSlice.actions;
+export const { resetQuestionState, setQuestions, setQuestionsWithAnswers } = questionCreateSlice.actions;
 
 export default questionCreateSlice.reducer;
